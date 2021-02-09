@@ -15,17 +15,16 @@ year_start = 2012
 year_end = 2021
 player_list=[]
 
-for i in range(97, 122):  #a-z char codes 
+for i in range(ord('a'), ord('z')):  #a-z char codes 
     
-    player_list_url = base_player_list_url+chr(i)
+    player_list_url = f'{base_player_list_url}{chr(i)}'
     res = requests.get(player_list_url)
     html = res.content
     soup = bs4.BeautifulSoup(html, 'html.parser')
-    player_table = str(soup.find('div',attrs={'id':'div_players'})).split('</thead>')[1]
-    parsable_table = bs4.BeautifulSoup(player_table, 'html.parser')
-    rows = parsable_table.findAll('tr')
+    player_table = soup.find('div',attrs={'id':'div_players'}).contents[1]
+    rows = player_table.findAll('tr')
     
-    for j in range(len(rows)):
+    for j in range(1,len(rows)):
         
         min_player_year = int(rows[j].findAll('td')[0].string)
         max_player_year = int(rows[j].findAll('td')[1].string)
@@ -47,7 +46,7 @@ base_player_url = 'https://www.basketball-reference.com'
 player_database = {}
 
 for i in range(len(player_list)):
-    full_player_url = base_player_url + player_list[i]['url']
+    full_player_url = f'{base_player_url}{player_list[i]["url"]}'
     player_name = player_list[i]['name']
     print(player_name)
     res = requests.get(full_player_url)
@@ -70,7 +69,7 @@ for i in range(len(player_list)):
     for j in range(1,len(player_pg_stats)):  # j is a season counter here
             pg_stats_table = player_pg_stats[j]
             adv_stats_table = player_adv_stats[j-dnp_offset]
-            sht_stats_table = player_sht_stats[j+1-dnp_offset-sht_offset-adl_team_offset]  # Offset extra 1 for god knows why thanks HTML
+            sht_stats_table = player_sht_stats[j + 1 - dnp_offset - sht_offset - adl_team_offset]  # Offset extra 1 for god knows why thanks HTML
             
             try:
                 year = pg_stats_table['id'].split('.')[1] # Cutting year to last of 2 (eg, 2016-17 reports as 2017)
